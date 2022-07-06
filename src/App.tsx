@@ -1,8 +1,9 @@
 import React from 'react';
+import { StartPage } from './pages/StarterPage/StartPage';
 
 const App: React.FC = () => (
   <div>
-    <p>Myk</p>
+    <StartPage/>
   </div>
 );
 
