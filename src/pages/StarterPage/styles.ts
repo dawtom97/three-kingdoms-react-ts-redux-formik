@@ -37,6 +37,7 @@ export const StepsBar = styled.div`
    display: flex;
    position: relative;
    justify-content: space-between;
+   margin-bottom: 40px;
    width: 100%;
    &::before {
     content: '';
@@ -48,18 +49,4 @@ export const StepsBar = styled.div`
     height: 3px;
     background-color: red;
    }
-`
-
-type StepsBarItemProps = {
-    isCompleted:boolean
-};
-
-export const StepsBarItem = styled.span<StepsBarItemProps>`
-       border-radius: 50%;
-    width:30px;
-    text-align: center;
-    line-height: 30px;
-    z-index: 1;
-    height: 30px;
-    background-color: ${({isCompleted})=> isCompleted ? 'gold' : 'red'};
 `
