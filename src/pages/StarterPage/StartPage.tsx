@@ -1,25 +1,106 @@
 import { Field, Form, Formik, FormikConfig, FormikValues } from "formik";
 import { Children, ReactElement, useState } from "react";
 import { object, string } from "yup";
+import { FormikSelect } from "../../components/molecules/FormikSelect/FormikSelect";
+import { StepsBarItem } from "../../components/molecules/StepsBarItem/StepsBarItem";
 import { heroes } from "../../constants/playerHeroes";
+import * as story from "../../constants/playerHistoryOptions";
 import * as Styled from "./styles";
+
+const initialSkills = [
+  {
+  name: 'strength',
+  value:15
+  },
+  {
+  name: 'intelligence',
+    value:15
+    },
+    {
+      name:'cunning',
+      value:15
+    },
+    {
+      name:'stewardship',
+      value:15
+    },
+    {
+      name:'charisma',
+      value:15
+    }
+
+]
+
+const initialArmy = [
+      {
+        name: 'militia',
+       amount:100
+      },
+      {
+        name: 'infantry',
+        amount:25
+      },
+      {
+        name:'archers',
+        amount:25
+      },
+      {
+        name:'cavalry',
+        amount:10
+      },
+      {
+        name:'elite',
+        amount:0
+      }
+]
 
 export type HeroCardProps = {
   avatar?: string;
 };
 
+
 const sleep = (time: number) => new Promise((acc) => setTimeout(acc, time));
 
+
+
 export const StartPage = () => {
+  const [skills, setSkills] = useState<any>(initialSkills);
+  const [army, setArmy] = useState<any>(initialArmy)
+
+  const increaseSkill = (payload:any) => {
+    const payloadEntries = Object.entries(payload).flat();
+    const findSkill = skills.find((item:any) => item.name === payloadEntries[0]);
+    findSkill.value = findSkill.value + payloadEntries[1];
+    const filtered = skills.filter((skill:any) => skill !== findSkill)
+    setSkills([...filtered, findSkill]);
+  }
+
+  const generateCharacter = () => {
+    const character = {
+      skills:skills,
+      money:2000,
+      stone:50,
+      wood:100,
+      prestige: 10,
+      army:army
+    }
+    console.log(character)
+  }
+
+  console.log(skills)
+
   return (
     <Styled.Container>
       <Styled.InnerWrapper>
         <FormikStepper
-
-          initialValues={{ name: "", motto: "", child: "" }}
+          initialValues={{
+            name: "",
+            motto: "",
+          }}
           onSubmit={async (values: any) => {
+            const updatedSkills = [values.childhood, values.youth, values.present, values.future]
             await sleep(500);
-            console.log(values);
+            updatedSkills.forEach((skill) => increaseSkill(skill));
           }}
         >
           <FormikStep
@@ -40,17 +121,27 @@ export const StartPage = () => {
             </Styled.HeroesBox>
           </FormikStep>
 
-          <FormikStep
-            label="family"
-            validationSchema={object({
-              child: string()
-                .min(5, "Too short")
-                .max(40, "Too long")
-                .required("Required"),
-            })}
-          >
-            <Field type="text" name="child" label="Your family motto" />
-            
+          <FormikStep label="family">
+            <Field
+              name="childhood"
+              component={FormikSelect}
+              options={story.childOptions}
+            />
+             <Field
+              name="youth"
+              component={FormikSelect}
+              options={story.youthOptions}
+            />
+            <Field
+              name="present"
+              component={FormikSelect}
+              options={story.presentOptions}
+            />
+            <Field
+              name="future"
+              component={FormikSelect}
+              options={story.futureOptions}
+            />
           </FormikStep>
           <FormikStep
             label="country"
@@ -61,7 +152,7 @@ export const StartPage = () => {
                 .required("Required"),
             })}
           >
-            <Field type="text" name="motto" label="Your family motto" />
+            <Field type="text" name="motto" label="Your family motto"/>
           </FormikStep>
         </FormikStepper>
       </Styled.InnerWrapper>
@@ -71,13 +162,9 @@ export const StartPage = () => {
 
 export interface FormikStepProps
   extends Pick<FormikConfig<FormikValues>, "children" | "validationSchema"> {
-    label:string
+  label: string;
 }
-export const FormikStep = ({ children }: FormikStepProps) => (
-  <>
-    {children}
-  </>
-);
+export const FormikStep = ({ children }: FormikStepProps) => <>{children}</>;
 
 export const FormikStepper = ({
   children,
@@ -89,7 +176,7 @@ export const FormikStepper = ({
   const [step, setStep] = useState(0);
   const currentChild = childrenArray[step];
 
-  console.log("props", props);
+ // console.log("props", props);
 
   const isLastStep = () => step === childrenArray.length - 1;
 
@@ -97,10 +184,12 @@ export const FormikStepper = ({
     <>
       <Styled.StepsBar>
         {childrenArray.map((child, index) => (
-          <Styled.StepsBarItem isCompleted={index <= step} key={index}>
-            {index + 1}
-            {child.props.label}
-          </Styled.StepsBarItem>
+          <StepsBarItem
+            key={index}
+            label={child.props.label}
+            isCompleted={index <= step}
+            index={index}
+          />
         ))}
       </Styled.StepsBar>
 
