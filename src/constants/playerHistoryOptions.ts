@@ -48,3 +48,16 @@ export const futureOptions = [
         ],
     },
 ]     
+
+export const careerOptions = [
+    {
+        label: "You started you career as...",
+        options: [
+            { label: "Vidoieo", value: { militia: 50 } },
+            { label: "Audoiio", value: { infantry: 20 } },
+            { label: "Graph (Charts, Fiigures...)", value: { archers: 20 } },
+            { label: "Picioture", value: { cavalry: 10 } },
+            // { label: "Othioer", value: { elite: 2 } },
+        ],
+    },
+]    

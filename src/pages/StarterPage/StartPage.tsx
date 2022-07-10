@@ -3,76 +3,26 @@ import { Children, ReactElement, useState } from "react";
 import { object, string } from "yup";
 import { FormikSelect } from "../../components/molecules/FormikSelect/FormikSelect";
 import { StepsBarItem } from "../../components/molecules/StepsBarItem/StepsBarItem";
+import { initialArmy, initialSkills } from "../../constants/initialValues";
 import { heroes } from "../../constants/playerHeroes";
 import * as story from "../../constants/playerHistoryOptions";
 import * as Styled from "./styles";
-
-const initialSkills = [
-  {
-  name: 'strength',
-  value:15
-  },
-  {
-  name: 'intelligence',
-    value:15
-    },
-    {
-      name:'cunning',
-      value:15
-    },
-    {
-      name:'stewardship',
-      value:15
-    },
-    {
-      name:'charisma',
-      value:15
-    }
-
-]
-
-const initialArmy = [
-      {
-        name: 'militia',
-       amount:100
-      },
-      {
-        name: 'infantry',
-        amount:25
-      },
-      {
-        name:'archers',
-        amount:25
-      },
-      {
-        name:'cavalry',
-        amount:10
-      },
-      {
-        name:'elite',
-        amount:0
-      }
-]
 
 export type HeroCardProps = {
   avatar?: string;
 };
 
-
-const sleep = (time: number) => new Promise((acc) => setTimeout(acc, time));
-
-
-
 export const StartPage = () => {
   const [skills, setSkills] = useState<any>(initialSkills);
-  const [army, setArmy] = useState<any>(initialArmy)
+  const [army, setArmy] = useState<any>(initialArmy);
+  const [newCharacter, setNewCharacter] = useState<any>();
 
-  const increaseSkill = (payload:any) => {
+  const increaseSkillsOrArmy = (payload:any,state:any,cb:(a:any[])=>void) => {
     const payloadEntries = Object.entries(payload).flat();
-    const findSkill = skills.find((item:any) => item.name === payloadEntries[0]);
-    findSkill.value = findSkill.value + payloadEntries[1];
-    const filtered = skills.filter((skill:any) => skill !== findSkill)
-    setSkills([...filtered, findSkill]);
+    const findValue = state.find((item:any) => item.name === payloadEntries[0]);
+    findValue.value = findValue.value + payloadEntries[1];
+    const filtered = state.filter((item:any) => item !== findValue);
+    cb([...filtered, findValue]);
   }
 
   const generateCharacter = () => {
@@ -84,10 +34,9 @@ export const StartPage = () => {
       prestige: 10,
       army:army
     }
-    console.log(character)
+    setNewCharacter(character);
+    console.log(newCharacter);
   }
-
-  console.log(skills)
 
   return (
     <Styled.Container>
@@ -96,11 +45,14 @@ export const StartPage = () => {
           initialValues={{
             name: "",
             motto: "",
+            career:""
           }}
           onSubmit={async (values: any) => {
-            const updatedSkills = [values.childhood, values.youth, values.present, values.future]
-            await sleep(500);
-            updatedSkills.forEach((skill) => increaseSkill(skill));
+            const updatedSkills = [values.childhood, values.youth, values.present, values.future];
+            const updatedArmy = [values.career, values.career1]
+            updatedSkills.forEach((skill) => increaseSkillsOrArmy(skill,skills,setSkills));
+            updatedArmy.forEach((career) => increaseSkillsOrArmy(career,army,setArmy));
+            generateCharacter();
           }}
         >
           <FormikStep
@@ -153,6 +105,16 @@ export const StartPage = () => {
             })}
           >
             <Field type="text" name="motto" label="Your family motto"/>
+            <Field
+              name="career"
+              component={FormikSelect}
+              options={story.careerOptions}
+            />
+            <Field
+              name="career1"
+              component={FormikSelect}
+              options={story.careerOptions}
+            />
           </FormikStep>
         </FormikStepper>
       </Styled.InnerWrapper>
@@ -175,8 +137,6 @@ export const FormikStepper = ({
   ) as ReactElement<FormikStepProps>[];
   const [step, setStep] = useState(0);
   const currentChild = childrenArray[step];
-
- // console.log("props", props);
 
   const isLastStep = () => step === childrenArray.length - 1;
 
